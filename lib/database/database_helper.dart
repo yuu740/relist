@@ -124,6 +124,23 @@ class DatabaseHelper {
     );
   }
 
+  Future<void> updateItemsOrder(List<Item> items) async {
+    final db = await instance.database;
+    final batch = db.batch();
+
+    for (int i = 0; i < items.length; i++) {
+      final item = items[i].copy(orderPosition: i.toDouble());
+      batch.update(
+        'items',
+        item.toMap(),
+        where: 'id = ?',
+        whereArgs: [item.id],
+      );
+    }
+
+    await batch.commit(noResult: true);
+  }
+
   Future close() async {
     final db = await instance.database;
     db.close();
